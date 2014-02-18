@@ -1,11 +1,18 @@
 
 public class Percolation {
 	//create N-by-N grid, with all sites blocked
+
 	private int N;							//Stores the initial percolation length	
 	private QuickFindUF percUnion;			//Data structure that stores connected elements
+	private int topID;						//Virutal Union ID for top connected elements
+	private int bottomID;					//Virtual Union ID for bottom connected elements
+
 	private boolean[][] percolationGrid;	//Array of open and closed elements
 	private boolean[][] fillGrid;			//Array of filled elements
-	
+	private int convertIndexToUnionID(int i, int j)
+	{
+		return (i*N) + j;
+	}
 	public Percolation(int N)				
 	{
 		//Initialize 2d Array to store blocked/open percolation sites
@@ -17,24 +24,37 @@ public class Percolation {
 				percolationGrid[i][j] = false;
 			}
 		}
-		N = N;
-		percUnion = new QuickFindUF(N*N); 
+		this.N = N;
+		topID = (N*N);
+		bottomID = (N*N)+1;
+		//Creates a new Union Find Data structure with 2 virtual elements for top and bottom
+		percUnion = new QuickFindUF(N*N+2);	
 	}
 	//open site (row i, column j) if it is not already
 	public void open(int i, int j)			
 	{
-		if (i <= 0 ||  i > N) throw new IndexOutOfBoundsException("row index i out of bounds");
-		if (j <= 0 ||  j > N) throw new IndexOutOfBoundsException("row index i out of bounds");
+		//if (i <= 0 ||  i > N) throw new IndexOutOfBoundsException("row index i out of bounds");
+		//if (j <= 0 ||  j > N) throw new IndexOutOfBoundsException("row index i out of bounds");
 		
 		if (!percolationGrid[i][j])
 		{
 			percolationGrid[i][j] = true;
-			int unionID = (i*(N) + j);
+			int unionID = convertIndexToUnionID(i, j);
+			//Update Fill Status with Connected to Virtual Top
+			if (i == 0)
+			{
+				percUnion.union(unionID, topID);
+			}
+			//Update Fill Status with Connected to Virtual Top
+			if (i == N-1)
+			{
+				percUnion.union(unionID, bottomID);
+			}
 			//Union Northern Unit if it exists
 			if (i > 0)
 			{	
 				if (isOpen(i - 1, j))
-					percUnion.union(unionID, unionID-N);
+					percUnion.union(unionID, unionID - N);
 			}
 			//Connect Western Unit if it exists
 			if (j > 0)
@@ -53,7 +73,8 @@ public class Percolation {
 			{
 				if (isOpen(i + 1, j))
 					percUnion.union(unionID, unionID + N);
-			}
+			}			
+
 		}
 		else
 			return;
@@ -66,20 +87,13 @@ public class Percolation {
 	//is site (row i, column j) full?
 	public boolean isFull(int i, int j)	
 	{
-		return false;
+		return percUnion.connected(convertIndexToUnionID(i,j), topID);
 	}
+	
 	//does the system percolate?
 	public boolean percolates()				
 	{
-		for (int k = 0; k < N; k++)
-		{
-			for (int j = 0; j < N; j++)
-			{
-				if (percUnion.connected(k, ((N-1)*N)+j))
-					return true;
-			}
-		}
-		return false;
+		return percUnion.connected(topID, bottomID);
 	}
 	
 	private void printPercolation()
