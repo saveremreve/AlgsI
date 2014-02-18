@@ -12,7 +12,7 @@ public class PercolationStats {
 		for (int i = 0; i < T; i++)
 		{
 			Percolation testPercolation = new Percolation(N);
-			resultsArray[i] = testPercolation.monteCarloSimulation();
+			resultsArray[i] = monteCarlo(testPercolation,N);
 		} 
 	}
 	
@@ -36,16 +36,35 @@ public class PercolationStats {
 		return this.mean() + ((1.96*(this.stddev()))/Math.sqrt(this.resultsArray.length));
 	}
 	
+	private float monteCarlo(Percolation p, int N)
+	{
+		int count = 0;
+		while (!p.percolates() || count < N)
+		{
+			boolean randOpen = false;
+			while (!randOpen)
+			{
+				int randi = StdRandom.uniform(1,N+1);
+				int randj = StdRandom.uniform(1,N+1);
+				if (!p.isOpen(randi, randj))
+				{
+					p.open(randi, randj);
+					//printPercolation();
+					count++;
+					randOpen = true;
+				}
+			}
+		}
+		return (float) count/(N*N);
+	}
+	
 	public static void main(String[] args) {
 		int N = Integer.parseInt(args[0]);
 		int T = Integer.parseInt(args[1]);
 		
 		Stopwatch sw = new Stopwatch();
 		PercolationStats ps = new PercolationStats(N, T);
-		for (int i = 0; i < T; i++)
-		{
-			StdOut.println(ps.resultsArray[i]);
-		}
+
 		//Print Results
 		StdOut.println(args[0] + " " + args[1]);
 		String formats = "%-24s %-2s";
