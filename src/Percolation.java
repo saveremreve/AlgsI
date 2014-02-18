@@ -1,9 +1,10 @@
 
 public class Percolation {
 	//create N-by-N grid, with all sites blocked
-	private int size;						//Stores the initial percolation length	
+	private int N;							//Stores the initial percolation length	
 	private QuickFindUF percUnion;			//Data structure that stores connected elements
 	private boolean[][] percolationGrid;	//Array of open and closed elements
+	private boolean[][] fillGrid;			//Array of filled elements
 	
 	public Percolation(int N)				
 	{
@@ -16,39 +17,42 @@ public class Percolation {
 				percolationGrid[i][j] = false;
 			}
 		}
-		this.size = N;
-		this.percUnion = new QuickFindUF(N*N); 
+		N = N;
+		percUnion = new QuickFindUF(N*N); 
 	}
 	//open site (row i, column j) if it is not already
 	public void open(int i, int j)			
 	{
+		if (i <= 0 ||  i > N) throw new IndexOutOfBoundsException("row index i out of bounds");
+		if (j <= 0 ||  j > N) throw new IndexOutOfBoundsException("row index i out of bounds");
+		
 		if (!percolationGrid[i][j])
 		{
 			percolationGrid[i][j] = true;
-			int unionID = (i*(this.size) + j);
+			int unionID = (i*(N) + j);
 			//Union Northern Unit if it exists
 			if (i > 0)
 			{	
-				if (this.isOpen(i - 1, j))
-					percUnion.union(unionID, unionID-this.size);
+				if (isOpen(i - 1, j))
+					percUnion.union(unionID, unionID-N);
 			}
 			//Connect Western Unit if it exists
 			if (j > 0)
 			{
-				if (this.isOpen(i, j-1))
+				if (isOpen(i, j-1))
 					percUnion.union(unionID, unionID-1);
 			}
 			//Connect Eastern Unit if it exists
-			if (j < this.size-1)
+			if (j < N-1)
 			{
-				if (this.isOpen(i, j+1))
+				if (isOpen(i, j+1))
 					percUnion.union(unionID, unionID+1);
 			}
 			//Connect Southern Unit if it exists
-			if (i < this.size-1)
+			if (i < N-1)
 			{
-				if (this.isOpen(i + 1, j))
-					percUnion.union(unionID, unionID + this.size);
+				if (isOpen(i + 1, j))
+					percUnion.union(unionID, unionID + N);
 			}
 		}
 		else
@@ -67,11 +71,11 @@ public class Percolation {
 	//does the system percolate?
 	public boolean percolates()				
 	{
-		for (int k = 0; k < this.size; k++)
+		for (int k = 0; k < N; k++)
 		{
-			for (int j = 0; j < this.size; j++)
+			for (int j = 0; j < N; j++)
 			{
-				if (percUnion.connected(k, ((this.size-1)*this.size)+j))
+				if (percUnion.connected(k, ((N-1)*N)+j))
 					return true;
 			}
 		}
@@ -80,11 +84,11 @@ public class Percolation {
 	
 	private void printPercolation()
 	{
-		for (int i = 0; i < this.size; i++)
+		for (int i = 0; i < N; i++)
 		{
-			for (int j = 0; j < this.size; j++)
+			for (int j = 0; j < N; j++)
 			{
-				if (!this.percolationGrid[i][j])
+				if (!percolationGrid[i][j])
 					StdOut.print("O");
 				else
 					StdOut.print("X");
@@ -96,24 +100,24 @@ public class Percolation {
 	public float monteCarloSimulation()
 	{
 		int count = 0;
-		while (!this.percolates() || count < this.size)
+		while (!percolates() || count < N)
 		{
 			boolean randOpen = false;
 			while (!randOpen)
 			{
-				int randi = StdRandom.uniform(this.size);
-				int randj = StdRandom.uniform(this.size);
-				if (!this.isOpen(randi, randj))
+				int randi = StdRandom.uniform(N);
+				int randj = StdRandom.uniform(N);
+				if (!isOpen(randi, randj))
 				{
-					this.open(randi, randj);
-					//this.printPercolation();
+					open(randi, randj);
+					//printPercolation();
 					count++;
 					randOpen = true;
 				}
 			}
 		}
 		StdOut.println("Monte Carlo Simulation Complete in: " + count);
-		return (float) count/(this.size*this.size);
+		return (float) count/(N*N);
 	}
 	
 };

@@ -35,11 +35,12 @@ public class PercolationStats {
 	}
 	
 	public static void main(String[] args) {
-		int percSize = Integer.parseInt(args[0]);
-		int simCount = Integer.parseInt(args[1]);
+		int N = Integer.parseInt(args[0]);
+		int T = Integer.parseInt(args[1]);
+		
 		Stopwatch sw = new Stopwatch();
-		PercolationStats ps = new PercolationStats(percSize, simCount);
-		for (int i = 0; i < simCount; i++)
+		PercolationStats ps = new PercolationStats(N, T);
+		for (int i = 0; i < T; i++)
 		{
 			StdOut.println(ps.resultsArray[i]);
 		}
