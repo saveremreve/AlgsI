@@ -108,7 +108,9 @@ public class Percolation {
             throw new IndexOutOfBoundsException("row index j out of bounds");
         return ((i - 1) * N) + (j - 1);
     }
-
+    
+    /*
+    *Percolation Test Code
     private void printPercolation() {
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
@@ -136,5 +138,6 @@ public class Percolation {
         p.testOpen(4, 5);
         p.testOpen(5, 5);
         p.testOpen(1, 5);
-    }
+    } 
+    */
 };
