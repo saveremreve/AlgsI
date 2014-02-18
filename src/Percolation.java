@@ -3,14 +3,16 @@ public class Percolation {
 	//create N-by-N grid, with all sites blocked
 
 	private int N;							//Stores the initial percolation length	
-	private QuickFindUF percUnion;			//Data structure that stores connected elements
-	private int topID;						//Virutal Union ID for top connected elements
+	private WeightedQuickUnionUF percUnion;			//Data structure that stores connected elements
+	private int topID;						//Virtual Union ID for top connected elements
 	private int bottomID;					//Virtual Union ID for bottom connected elements
 	private boolean[][] percolationGrid;	//Array of open and closed elements
 	
 	private int convertIndexToUnionID(int i, int j)
 	{
-		return (i*N) + j;
+		if (i <= 0 ||  i > N) throw new IndexOutOfBoundsException("row index i out of bounds");
+		if (j <= 0 ||  j > N) throw new IndexOutOfBoundsException("row index j out of bounds");
+		return ((i-1)*N) + (j-1);
 	}
 	
 	public Percolation(int N)				
@@ -28,7 +30,7 @@ public class Percolation {
 		topID = (N*N);
 		bottomID = (N*N)+1;
 		//Creates a new Union Find Data structure with 2 virtual elements for top and bottom
-		percUnion = new QuickFindUF(N*N+2);	
+		percUnion = new WeightedQuickUnionUF((N*N)+2);	
 	}
 	
 	//open site (row i, column j) if it is not already
@@ -44,7 +46,7 @@ public class Percolation {
 		if (!percolationGrid[i-1][j-1])
 		{
 			percolationGrid[i-1][j-1] = true;
-			int unionID = convertIndexToUnionID(i-1, j-1);
+			int unionID = convertIndexToUnionID(i, j);
 			//Update Fill Status with Connected to Virtual Top
 			if (i-1 == 0)
 			{
@@ -99,6 +101,7 @@ public class Percolation {
 	{
 		if (i <= 0 ||  i > N) throw new IndexOutOfBoundsException("row index i out of bounds");
 		if (j <= 0 ||  j > N) throw new IndexOutOfBoundsException("row index j out of bounds");
+		
 		return percUnion.connected(convertIndexToUnionID(i,j), topID);
 	}
 	
@@ -106,5 +109,39 @@ public class Percolation {
 	public boolean percolates()				
 	{
 		return percUnion.connected(topID, bottomID);
+	}
+	
+	private void printPercolation()
+  	{
+ 		for (int i = 0; i < N; i++)
+  		{
+ 			for (int j = 0; j < N; j++)
+  			{
+ 				if (!percolationGrid[i][j])
+  					StdOut.print("O");
+  				else
+  					StdOut.print("X");
+  			}
+ 			StdOut.print('\n');
+  		}
+  	}
+	
+	private void testOpen(int i, int j)
+	{
+		StdOut.println("Opened: " + i + ", " + j);
+		this.open(i, j);
+		this.printPercolation();
+		StdOut.println("Percolates?: " + this.percolates());
+	}
+	
+	public static void main(String[] args) 
+	{
+		Percolation p = new Percolation(5);
+		p.printPercolation();
+		p.testOpen(2,5);
+		p.testOpen(3,5);
+		p.testOpen(4,5);
+		p.testOpen(5,5);
+		p.testOpen(1,5);
 	}
 };

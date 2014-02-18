@@ -1,13 +1,14 @@
 
 public class PercolationStats {
-	
+
 	private double[] resultsArray;	//Stores Series of Simulation Results for Stat Analysis
 	
 	//perform T independent computational experiments on an N-by-N grid
 	public PercolationStats(int N, int T)			
 	{
-		if (N <= 0) throw new IndexOutOfBoundsException("N out of bounds");
-		if (T <= 0 ) throw new IndexOutOfBoundsException("T out of bounds");
+		if (N <= 0) throw new IllegalArgumentException("N Must be larger than 0");
+		if (T <= 0 ) throw new IllegalArgumentException("T Must be larger than 0");
+		
 		resultsArray = new double[T];
 		for (int i = 0; i < T; i++)
 		{
